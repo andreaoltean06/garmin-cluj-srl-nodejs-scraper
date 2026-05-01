@@ -1,0 +1,38 @@
+﻿name: Daily Scrape
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Install Puppeteer Chrome
+      run: npx puppeteer browsers install chrome
+    
+    - name: Run scraper
+      env:
+        SOLR_AUTH: ${{ secrets.SOLR_AUTH }}
+      run: npm run scrape
+    
+    - name: Upload artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: scraped-data
+        path: jobs.json
+
