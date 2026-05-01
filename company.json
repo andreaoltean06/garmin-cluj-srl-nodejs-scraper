@@ -1,0 +1,57 @@
+{
+  "validatedAt": "2026-05-01T19:16:52.559Z",
+  "source": "ANAF",
+  "brand": "GARMIN",
+  "anaf": {
+    "administrators": [
+      {
+        "name": "ȚICUDEAN AIDA-VIRGINIA",
+        "role": "administrator"
+      }
+    ],
+    "authorizedCaenCodes": [
+      "5829",
+      "6210",
+      "6220",
+      "6290",
+      "6310",
+      "6391",
+      "7311",
+      "7312",
+      "7320",
+      "8299"
+    ],
+    "onrcStatus": 1048,
+    "onrcStatusLabel": "Funcțiune",
+    "cui": 18850101,
+    "name": "GARMIN CLUJ SRL",
+    "registrationNumber": "J2006002398127",
+    "registrationDate": "13/07/2006",
+    "legalForm": "SRL",
+    "address": "ALEXANDRU VAIDA VOEVOD, 51, Cluj, Municipiul Cluj-Napoca",
+    "postalCode": "400436",
+    "headquartersAddress": {
+      "street": "ALEXANDRU VAIDA VOEVOD",
+      "number": "51",
+      "locality": "Cluj",
+      "county": "Municipiul Cluj-Napoca",
+      "country": "România",
+      "postalCode": "400436"
+    },
+    "vatCheckedAt": null,
+    "vatStatus": "verifying"
+  },
+  "peviitor": null,
+  "summary": {
+    "company": "GARMIN CLUJ SRL",
+    "cif": "18850101",
+    "active": true,
+    "inactiveSince": null,
+    "reactivatedSince": null,
+    "address": "ALEXANDRU VAIDA VOEVOD, 51, Cluj, Municipiul Cluj-Napoca",
+    "registrationNumber": "J2006002398127",
+    "caenCode": null,
+    "vatRegistered": false,
+    "eFacturaRegistered": false
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "source": "garmin.com",
+  "scrapedAt": "2026-05-01T19:16:58.548Z",
+  "company": "GARMIN CLUJ SRL",
+  "cif": "18850101",
+  "jobs": [
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/F91D4C1B10/",
+      "title": "Senior IT Compliance Analyst | Cybersecurity Team",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/0393C91EC2/",
+      "title": "Java Software Engineer | eCommerce team",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        "java",
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/10915F8F3B/",
+      "title": "Staff Systems Engineer | Automotive",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/F59DF6847A/",
+      "title": "Cloud Security Engineer | Cybersecurity Team",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        "cloud",
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/61B37106BB/",
+      "title": "Senior .NET Software Engineer | Backend focus | inReach | 2 roles",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        ".net",
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/90643D1887/",
+      "title": "Team Leader Software Engineering | Java | Marine Cloud",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        "java",
+        "cloud",
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/DFA2BC0F37/",
+      "title": "Site Reliability Engineer | Cloud Team",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        "cloud",
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/C11C7E1079/",
+      "title": "Team Leader Software Engineering Mobile | Garmin Golf team",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/42A7E90D46/",
+      "title": "Cyber Security - Firewall Engineer (Perimeter)",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "tags": [
+        "engineer"
+      ],
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    },
+    {
+      "url": "https://apply.workable.com/garmin-cluj/j/6040EEE4C6/",
+      "title": "Team Leader Software Quality | Subscriptions team",
+      "company": "GARMIN CLUJ SRL",
+      "cif": "18850101",
+      "workmode": "on-site",
+      "date": "2026-05-01T19:16:58.548Z",
+      "status": "scraped",
+      "location": [
+        "Cluj-Napoca"
+      ]
+    }
+  ]
+}

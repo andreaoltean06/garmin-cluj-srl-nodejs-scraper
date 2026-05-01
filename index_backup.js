@@ -1,53 +1,35 @@
 ﻿/**
- * GARMIN Job Scraper - Main Entry Point
- */
-
-import fetch from "node-fetch";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { validateAndGetCompany } from "./company.js";
-import { querySOLR, deleteJobByUrl, upsertJobs } from "./solr.js";
-
-const COMPANY_CIF = "18850101";
-const TIMEOUT = 10000;
-const JOB_BASE = "https://apply.workable.com";
-const WORKABLE_SUBDOMAIN = "garmin-cluj";
-
-let COMPANY_NAME = null;
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-/**
  * Extract jobs using Puppeteer for JavaScript-rendered content
  */
-async function scrapeJobsWithPuppeteer() {
-  console.log("Launching Puppeteer...");
+async function scrapeJobsFromPage() {
   const puppeteer = await import("puppeteer");
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   
-  console.log("Opening Garmin careers page...");
+  console.log("Opening Garmin careers page with Puppeteer...");
   await page.goto("https://apply.workable.com/garmin-cluj/?lng=en", { waitUntil: "networkidle0" });
   
-  await page.waitForSelector("a[href*='/j/']", { timeout: 10000 }).catch(() => {
-    console.log("No job links found with primary selector");
+  // Wait for jobs to load
+  await page.waitForSelector(".job-card, [data-ui='job-card'], .job-item", { timeout: 10000 }).catch(() => {
+    console.log("No job cards found with primary selector, trying alternative...");
   });
   
+  // Extract job data
   const jobs = await page.evaluate(() => {
-    const jobLinks = document.querySelectorAll("a[href*='/j/']");
+    const jobElements = document.querySelectorAll(".job-card, [data-ui='job-card'], .job-item, a[href*='/j/']");
     const jobsData = [];
     
-    jobLinks.forEach(link => {
-      if (link.href && link.href.includes('/j/')) {
-        const card = link.closest("[class*='job'], [data-ui*='job']") || link;
-        const title = card.querySelector("h3, [class*='title']")?.innerText?.trim() || link.innerText?.trim();
-        const location = card.querySelector("[class*='location']")?.innerText?.trim();
-        
+    jobElements.forEach(elem => {
+      const link = elem.href || elem.querySelector("a")?.href;
+      const title = elem.querySelector("h3, .title, .job-title")?.innerText?.trim();
+      const location = elem.querySelector(".location, .job-location")?.innerText?.trim();
+      
+      if (link && link.includes("/j/")) {
         jobsData.push({
-          url: link.href,
+          url: link,
           title: title || "Job at Garmin Cluj",
-          location: location || "Cluj-Napoca",
-          shortcode: link.href.split("/").pop()
+          location: location ? [location] : ["Cluj-Napoca"],
+          shortcode: link.split("/").pop()
         });
       }
     });
@@ -56,27 +38,47 @@ async function scrapeJobsWithPuppeteer() {
   });
   
   await browser.close();
+  
   console.log(`Puppeteer extracted ${jobs.length} jobs`);
   return { jobs, total: jobs.length };
 }
-
-async function fetchJobsFromWorkable() {
-  const url = `https://apply.workable.com/api/v1/accounts/${WORKABLE_SUBDOMAIN}/jobs?limit=100`;
-  const res = await fetch(url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
-      "Accept": "application/json",
-      "Referer": "https://apply.workable.com/garmin-cluj/"
-    }
   });
   
   if (!res.ok) {
-    console.log(`Workable API error ${res.status}, using Puppeteer...`);
-    return await scrapeJobsWithPuppeteer();
+    console.log(`Workable API error ${res.status}, trying alternative approach...`);
+    return await scrapeJobsFromPage();
   }
   
   const data = await res.json();
   return data;
+}
+
+async function scrapeJobsFromPage() {
+  const url = "https://apply.workable.com/garmin-cluj/jobs/";
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+    }
+  });
+  
+  if (!res.ok) {
+    throw new Error(`Failed to fetch Garmin careers page: ${res.status}`);
+  }
+  
+  const html = await res.text();
+  const jobs = [];
+  const jobPattern = /href="(https:\/\/apply\.workable\.com\/garmin-cluj\/j\/[^"]+)"/g;
+  let match;
+  
+  while ((match = jobPattern.exec(html)) !== null) {
+    jobs.push({
+      url: match[1],
+      title: "Job at Garmin Cluj",
+      shortcode: match[1].split("/").pop()
+    });
+  }
+  
+  return { jobs, total: jobs.length };
 }
 
 function parseWorkableJobs(apiData) {
@@ -87,16 +89,16 @@ function parseWorkableJobs(apiData) {
       let workmode = "on-site";
       if (job.workplace_type?.toLowerCase().includes("remote")) workmode = "remote";
       else if (job.workplace_type?.toLowerCase().includes("hybrid")) workmode = "hybrid";
-        
+      
       const location = [];
       if (job.location?.city) {
         location.push(job.location.city);
       } else if (job.location?.country) {
         location.push(job.location.country);
       }
-        
+      
       const url = job.url || `${JOB_BASE}/${WORKABLE_SUBDOMAIN}/j/${job.shortcode}`;
-        
+      
       const tags = [];
       if (job.title) {
         const techKeywords = ["Java", "Python", "C++", "JavaScript", "React", "iOS", "Android", ".NET", "Data", "Cloud", "DevOps", "SRE", "Embedded", "Engineer"];
@@ -107,7 +109,7 @@ function parseWorkableJobs(apiData) {
           }
         }
       }
-        
+      
       return {
         url,
         title: job.title,
@@ -124,15 +126,15 @@ function parseWorkableJobs(apiData) {
 async function scrapeAllListings(testOnlyOnePage = false) {
   const allJobs = [];
   const seenUrls = new Set();
-    
+  
   try {
-    console.log("Fetching jobs from Workable API or Puppeteer...");
+    console.log("Fetching jobs from Workable API...");
     const data = await fetchJobsFromWorkable();
     const result = parseWorkableJobs(data);
     const jobs = result.jobs;
-      
-    console.log(`Found ${jobs.length} jobs`);
-        
+    
+    console.log(`Found ${jobs.length} jobs from Workable API`);
+    
     let newJobs = 0;
     for (const job of jobs) {
       if (!seenUrls.has(job.url)) {
@@ -141,14 +143,14 @@ async function scrapeAllListings(testOnlyOnePage = false) {
         newJobs++;
       }
     }
-      
+    
     console.log(`Total unique jobs: ${allJobs.length}`);
-      
+    
   } catch (err) {
-    console.error("Error fetching jobs:", err.message);
+    console.error("Error fetching from Workable:", err.message);
     throw err;
   }
-    
+  
   return allJobs;
 }
 
@@ -174,10 +176,10 @@ function mapToJobModel(rawJob, cif, companyName = COMPANY_NAME) {
 
 function transformJobsForSOLR(payload) {
   const romanianCities = [
-    "Cluj-Napoca", "Cluj Napoca", "Timisoara", "Timisoara", "Iasi", "Iasi",
-    "Brasov", "Brasov", "Constanta", "Constanta", "Bucuresti", "Bucharest",
-    "Sibiu", "Oradea", "Baia Mare", "Satu Mare", "Ploiesti", "Ploiesti",
-    "Pitesti", "Pitesti", "Arad", "Galati", "Galati", "Braila", "Buzau"
+    "Cluj-Napoca", "Cluj Napoca", "Timișoara", "Timisoara", "Iași", "Iasi",
+    "Brașov", "Brasov", "Constanța", "Constanta", "București", "Bucharest",
+    "Sibiu", "Oradea", "Baia Mare", "Satu Mare", "Ploiești", "Ploiesti",
+    "Pitești", "Pitesti", "Arad", "Galați", "Galati", "Braila", "Buzau"
   ];
 
   const citySet = new Set(romanianCities.map(c => c.toLowerCase()));
@@ -196,9 +198,9 @@ function transformJobsForSOLR(payload) {
     jobs: payload.jobs.map(job => {
       const validLocations = (job.location || []).filter(loc => {
         const lower = loc.toLowerCase().trim();
-        if (lower === "romania" || lower === "romania") return true;
+        if (lower === "romania" || lower === "românia") return true;
         return citySet.has(lower);
-      }).map(loc => loc.toLowerCase() === "romania" ? "Romania" : loc);
+      }).map(loc => loc.toLowerCase() === "romania" ? "România" : loc);
 
       return {
         ...job,
@@ -213,7 +215,7 @@ function transformJobsForSOLR(payload) {
 
 async function main() {
   const testOnlyOnePage = process.argv.includes("--test");
-    
+  
   try {
     console.log("=== Step 1: Get existing jobs count ===");
     const existingResult = await querySOLR(COMPANY_CIF);
@@ -224,7 +226,7 @@ async function main() {
     const { company, cif } = await validateAndGetCompany();
     COMPANY_NAME = company;
     const localCif = cif;
-      
+    
     const rawJobs = await scrapeAllListings(testOnlyOnePage);
     const scrapedCount = rawJobs.length;
     console.log(`Jobs scraped from Garmin Careers: ${scrapedCount}`);
@@ -271,3 +273,4 @@ export { parseWorkableJobs, mapToJobModel, transformJobsForSOLR };
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }
+
